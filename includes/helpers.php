@@ -151,3 +151,58 @@ function formatDate($dateString, $format = 'M j, Y') {
     if (empty($dateString)) return 'N/A';
     return date($format, strtotime($dateString));
 }
+
+/**
+ * Calculate Property Unit Occupancy Metrics
+ */
+function calculateUnitOccupancy($unit_id) {
+    $db = Database::getInstance();
+
+    // 1. Head of Household (max 1)
+    $head = $db->fetchOne("SELECT COUNT(*) as cnt FROM residents WHERE unit_id = ? AND status = 'active' AND is_head_of_household = 1", [$unit_id]);
+    $headCount = (int)($head['cnt'] ?? 0);
+
+    // 2. Co-Residents
+    $coRes = $db->fetchOne("SELECT COUNT(*) as cnt FROM residents WHERE unit_id = ? AND status = 'active' AND is_head_of_household = 0", [$unit_id]);
+    $coResidentCount = (int)($coRes['cnt'] ?? 0);
+
+    // 3. Household Dependents
+    $deps = $db->fetchOne("SELECT COUNT(*) as cnt FROM household_members hm JOIN residents r ON hm.primary_resident_id = r.id WHERE (hm.unit_id = ? OR r.unit_id = ?) AND r.status = 'active'", [$unit_id, $unit_id]);
+    $dependentCount = (int)($deps['cnt'] ?? 0);
+
+    // Total Household Residents
+    $totalHouseholdResidents = $headCount + $coResidentCount + $dependentCount;
+
+    // 4. Live-In Staff
+    $liveIn = $db->fetchOne("SELECT COUNT(*) as cnt FROM domestic_staff WHERE unit_id = ? AND access_status = 'active' AND residence_type = 'live_in'", [$unit_id]);
+    $liveInStaffCount = (int)($liveIn['cnt'] ?? 0);
+
+    // Total Permanent Physical Occupancy
+    $permanentOccupancy = $totalHouseholdResidents + $liveInStaffCount;
+
+    // 5. Daily Staff
+    $daily = $db->fetchOne("SELECT COUNT(*) as cnt FROM domestic_staff WHERE unit_id = ? AND access_status = 'active' AND residence_type = 'daily'", [$unit_id]);
+    $dailyStaffCount = (int)($daily['cnt'] ?? 0);
+
+    // 6. Commercial Employees
+    $comm = $db->fetchOne("SELECT COUNT(*) as cnt FROM commercial_employees ce JOIN commercial_occupants co ON ce.commercial_id = co.id WHERE co.unit_id = ? AND ce.access_status = 'active'", [$unit_id]);
+    $commercialStaffCount = (int)($comm['cnt'] ?? 0);
+
+    // 7. Active Visitors Inside
+    $vis = $db->fetchOne("SELECT COUNT(*) as cnt FROM gate_logs WHERE unit_id = ? AND exit_timestamp IS NULL AND DATE(entry_timestamp) = CURDATE()", [$unit_id]);
+    $visitorsInsideCount = (int)($vis['cnt'] ?? 0);
+
+    return [
+        'head_count' => $headCount,
+        'co_resident_count' => $coResidentCount,
+        'dependent_count' => $dependentCount,
+        'total_household_residents' => $totalHouseholdResidents,
+        'live_in_staff_count' => $liveInStaffCount,
+        'permanent_occupancy' => $permanentOccupancy,
+        'daily_staff_count' => $dailyStaffCount,
+        'commercial_staff_count' => $commercialStaffCount,
+        'visitors_inside_count' => $visitorsInsideCount,
+        'daily_active_personnel' => $dailyStaffCount + $commercialStaffCount + $visitorsInsideCount
+    ];
+}
+

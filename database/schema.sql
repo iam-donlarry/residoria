@@ -287,6 +287,7 @@ CREATE TABLE IF NOT EXISTS `residents` (
   `unit_id` int(11) NOT NULL,
   `resident_code` varchar(50) NOT NULL,
   `residency_category` enum('owner_occupier','tenant','co_resident') DEFAULT 'tenant',
+  `is_head_of_household` tinyint(1) NOT NULL DEFAULT 0,
   `move_in_date` date DEFAULT NULL,
   `scheduled_move_out_date` date DEFAULT NULL,
   `actual_move_out_date` date DEFAULT NULL,
@@ -306,14 +307,17 @@ CREATE TABLE IF NOT EXISTS `residents` (
 CREATE TABLE IF NOT EXISTS `household_members` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `primary_resident_id` int(11) NOT NULL,
+  `unit_id` int(11) NOT NULL,
   `person_id` int(11) NOT NULL,
   `relationship_to_head` varchar(50) NOT NULL,
   `is_minor` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `fk_hm_resident` (`primary_resident_id`),
+  KEY `fk_hm_unit` (`unit_id`),
   KEY `fk_hm_person` (`person_id`),
   CONSTRAINT `fk_hm_resident` FOREIGN KEY (`primary_resident_id`) REFERENCES `residents` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_hm_unit` FOREIGN KEY (`unit_id`) REFERENCES `property_units` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_hm_person` FOREIGN KEY (`person_id`) REFERENCES `persons` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -341,6 +345,23 @@ CREATE TABLE IF NOT EXISTS `commercial_occupants` (
   KEY `fk_comm_contact` (`principal_contact_person_id`),
   CONSTRAINT `fk_comm_unit` FOREIGN KEY (`unit_id`) REFERENCES `property_units` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_comm_contact` FOREIGN KEY (`principal_contact_person_id`) REFERENCES `persons` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Table structure for table `commercial_employees`
+--
+CREATE TABLE IF NOT EXISTS `commercial_employees` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `commercial_id` int(11) NOT NULL,
+  `person_id` int(11) NOT NULL,
+  `job_title` varchar(100) NOT NULL DEFAULT 'Employee',
+  `access_status` enum('active','suspended') DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `fk_ce_commercial` (`commercial_id`),
+  KEY `fk_ce_person` (`person_id`),
+  CONSTRAINT `fk_ce_commercial` FOREIGN KEY (`commercial_id`) REFERENCES `commercial_occupants` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ce_person` FOREIGN KEY (`person_id`) REFERENCES `persons` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -382,6 +403,10 @@ CREATE TABLE IF NOT EXISTS `domestic_staff` (
   `gate_access_end_time` time DEFAULT '18:00:00',
   `verification_status` enum('pending','verified','rejected') DEFAULT 'pending',
   `verification_notes` text DEFAULT NULL,
+  `guarantor_name` varchar(150) DEFAULT NULL,
+  `guarantor_phone` varchar(20) DEFAULT NULL,
+  `guarantor_address` text DEFAULT NULL,
+  `nin_number` varchar(50) DEFAULT NULL,
   `access_status` enum('active','suspended','revoked') DEFAULT 'active',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
@@ -452,11 +477,16 @@ CREATE TABLE IF NOT EXISTS `visitor_passes` (
   `visitor_name` varchar(150) NOT NULL,
   `visitor_phone` varchar(20) DEFAULT NULL,
   `visitor_category` enum('guest','delivery','contractor','service_provider','event') DEFAULT 'guest',
+  `pass_type` enum('single_entry','multi_entry') DEFAULT 'single_entry',
   `visit_date` date NOT NULL,
+  `valid_from_date` date DEFAULT NULL,
+  `valid_until_date` date DEFAULT NULL,
   `expected_arrival_start` time DEFAULT NULL,
   `expected_arrival_end` time DEFAULT NULL,
   `vehicle_plate_number` varchar(50) DEFAULT NULL,
   `expected_visitor_count` int(11) DEFAULT 1,
+  `max_uses` int(11) DEFAULT 1,
+  `use_count` int(11) DEFAULT 0,
   `pass_status` enum('active','used','expired','cancelled') DEFAULT 'active',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
@@ -480,6 +510,7 @@ CREATE TABLE IF NOT EXISTS `gate_logs` (
   `entry_timestamp` datetime DEFAULT current_timestamp(),
   `exit_timestamp` datetime DEFAULT NULL,
   `processing_officer_user_id` int(11) DEFAULT NULL,
+  `exit_processing_officer_user_id` int(11) DEFAULT NULL,
   `entry_type` enum('pre_authorized','walk_in') DEFAULT 'pre_authorized',
   `notes` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -487,9 +518,11 @@ CREATE TABLE IF NOT EXISTS `gate_logs` (
   KEY `fk_gl_pass` (`pass_id`),
   KEY `fk_gl_unit` (`unit_id`),
   KEY `fk_gl_officer` (`processing_officer_user_id`),
+  KEY `fk_gl_exit_officer` (`exit_processing_officer_user_id`),
   CONSTRAINT `fk_gl_pass` FOREIGN KEY (`pass_id`) REFERENCES `visitor_passes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_gl_unit` FOREIGN KEY (`unit_id`) REFERENCES `property_units` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_gl_officer` FOREIGN KEY (`processing_officer_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+  CONSTRAINT `fk_gl_officer` FOREIGN KEY (`processing_officer_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_gl_exit_officer` FOREIGN KEY (`exit_processing_officer_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -504,14 +537,15 @@ CREATE TABLE IF NOT EXISTS `tariffs` (
   `due_days` int(11) DEFAULT 30,
   `penalty_percent` decimal(5,2) DEFAULT 0.00,
   `is_active` tinyint(1) DEFAULT 1,
+  `default_payer_role` enum('owner','tenant') DEFAULT 'tenant',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `tariffs` (`id`, `name`, `category`, `amount`, `frequency`, `due_days`, `penalty_percent`) VALUES
-(1, 'Monthly Estate Service Charge', 'service_charge', 15000.00, 'monthly', 30, 5.00),
-(2, 'Monthly Security Levy', 'security', 5000.00, 'monthly', 30, 0.00),
-(3, 'Waste Management Fee', 'waste', 3000.00, 'monthly', 30, 0.00)
+INSERT INTO `tariffs` (`id`, `name`, `category`, `amount`, `frequency`, `due_days`, `penalty_percent`, `default_payer_role`) VALUES
+(1, 'Monthly Estate Service Charge', 'service_charge', 15000.00, 'monthly', 30, 5.00, 'tenant'),
+(2, 'Monthly Security Levy', 'security', 5000.00, 'monthly', 30, 0.00, 'tenant'),
+(3, 'Waste Management Fee', 'waste', 3000.00, 'monthly', 30, 0.00, 'tenant')
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
 
 --
@@ -531,11 +565,13 @@ CREATE TABLE IF NOT EXISTS `invoices` (
   `due_date` date NOT NULL,
   `billing_period_start` date DEFAULT NULL,
   `billing_period_end` date DEFAULT NULL,
+  `batch_reference` varchar(50) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `invoice_number` (`invoice_number`),
   KEY `fk_inv_unit` (`unit_id`),
   KEY `fk_inv_payer` (`payer_person_id`),
+  KEY `idx_batch_ref` (`batch_reference`),
   CONSTRAINT `fk_inv_unit` FOREIGN KEY (`unit_id`) REFERENCES `property_units` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_inv_payer` FOREIGN KEY (`payer_person_id`) REFERENCES `persons` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

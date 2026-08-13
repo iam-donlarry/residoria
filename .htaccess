@@ -1,23 +1,38 @@
 # Clean URL Rewrite Rules for Estate Management System
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /Estate/
-
-    # Skip rewrites for existing physical files and directories
+    
+    # Do not rewrite existing physical files or directories
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # Route clean URLs to modules without 'modules/' in URL
-    RewriteRule ^dashboard/?$ dashboard.php [L,QSA]
+    # Specific Sub-Actions (e.g. /properties/view?id=4 -> modules/properties/view.php?id=4)
+    RewriteRule ^properties/view/?$ modules/properties/view.php [L,QSA]
+    RewriteRule ^properties/building_view/?$ modules/properties/building_view.php [L,QSA]
+
+    # Generic module action routing: e.g. /module/action -> modules/module/action.php
+    RewriteRule ^([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/?$ modules/$1/$2.php [L,QSA]
+
+    # Module Index routing: e.g. /properties -> modules/properties/index.php
+    RewriteRule ^dashboard/?$ modules/dashboard/index.php [L,QSA]
     RewriteRule ^properties/?$ modules/properties/index.php [L,QSA]
-    RewriteRule ^residents/?$ modules/residents/index.php [L,QSA]
-    RewriteRule ^billing/?$ modules/billing/index.php [L,QSA]
+    RewriteRule ^people/?$ modules/people/index.php [L,QSA]
     RewriteRule ^owners/?$ modules/owners/index.php [L,QSA]
-    RewriteRule ^staff/?$ modules/staff/index.php [L,QSA]
+    RewriteRule ^residents/?$ modules/residents/index.php [L,QSA]
+    RewriteRule ^households/?$ modules/households/index.php [L,QSA]
+    RewriteRule ^commercial/?$ modules/commercial/index.php [L,QSA]
+    RewriteRule ^domestic-staff/?$ modules/domestic-staff/index.php [L,QSA]
+    RewriteRule ^estate-staff/?$ modules/estate-staff/index.php [L,QSA]
+    RewriteRule ^staff/?$ modules/estate-staff/index.php [L,QSA]
+    RewriteRule ^vehicles/?$ modules/vehicles/index.php [L,QSA]
+    RewriteRule ^gate/?$ modules/gate/index.php [L,QSA]
+    RewriteRule ^security/?$ modules/gate/index.php [L,QSA]
+    RewriteRule ^visitors/?$ modules/visitors/index.php [L,QSA]
+    RewriteRule ^billing/?$ modules/billing/index.php [L,QSA]
     RewriteRule ^maintenance/?$ modules/maintenance/index.php [L,QSA]
-    RewriteRule ^security/?$ modules/security/index.php [L,QSA]
-    RewriteRule ^settings/?$ modules/settings/index.php [L,QSA]
     RewriteRule ^roles/?$ modules/roles/index.php [L,QSA]
+    RewriteRule ^users/?$ modules/users/index.php [L,QSA]
+    RewriteRule ^settings/?$ modules/settings/index.php [L,QSA]
     RewriteRule ^reports/?$ modules/reports/index.php [L,QSA]
 </IfModule>

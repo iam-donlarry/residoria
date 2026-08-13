@@ -1,9 +1,12 @@
-/* assets/js/modal.js - Offcanvas Slide-Over Engine (Half-Screen 50vw Drawers) */
+/* assets/js/modal.js - Offcanvas Slide-Over Engine & Modal Dialog Handler */
 
 (function() {
     window.openModal = function(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
+            modal.style.display = 'flex';
+            // Force browser repaint to trigger CSS opacity & slide transition
+            void modal.offsetWidth;
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
             if (window.lucide) window.lucide.createIcons();
@@ -14,6 +17,11 @@
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.remove('active');
+            setTimeout(() => {
+                if (!modal.classList.contains('active')) {
+                    modal.style.display = 'none';
+                }
+            }, 250);
             document.body.style.overflow = '';
         }
     };
@@ -26,11 +34,10 @@
         window.closeModal(panelId);
     };
 
-    // Global listener to close Offcanvas on backdrop click
+    // Global listener to close Offcanvas/Modal on backdrop click
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('offcanvas-overlay')) {
-            e.target.classList.remove('active');
-            document.body.style.overflow = '';
+            window.closeModal(e.target.id);
         }
     });
 

@@ -4,7 +4,7 @@ require_once __DIR__ . '/config.php';
 
 // If already logged in, redirect to main dashboard
 if (isset($_SESSION['user_id'])) {
-    header("Location: modules/dashboard");
+    header("Location: dashboard");
     exit;
 }
 
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     logAudit($conn, "User Login", "Auth", "Logged in successfully as " . $user['email']);
 
-                    header("Location: modules/dashboard");
+                    header("Location: dashboard");
                     exit;
                 }
             } else {

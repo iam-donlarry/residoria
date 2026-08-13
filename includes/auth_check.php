@@ -1,19 +1,21 @@
 <?php
 // includes/auth_check.php - Centralized Route Authentication Guard
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/rbac.php';
+
+$loginUrl = BASE_URL . 'index.php';
 
 // Verify session authentication
 if (!isset($_SESSION['user_id'])) {
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-        jsonResponse(false, "Session expired. Please log in again.", ['redirect' => '../index.php'], 401);
+        jsonResponse(false, "Session expired. Please log in again.", ['redirect' => $loginUrl], 401);
     } else {
-        header("Location: ../index.php");
+        header("Location: " . $loginUrl);
         exit;
     }
 }
@@ -23,10 +25,11 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     session_unset();
     session_destroy();
     session_start();
+    $timeoutUrl = $loginUrl . '?timeout=1';
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-        jsonResponse(false, "Session timed out due to inactivity.", ['redirect' => '../index.php'], 401);
+        jsonResponse(false, "Session timed out due to inactivity.", ['redirect' => $timeoutUrl], 401);
     } else {
-        header("Location: ../index.php?timeout=1");
+        header("Location: " . $timeoutUrl);
         exit;
     }
 }

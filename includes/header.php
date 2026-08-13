@@ -10,7 +10,7 @@ require_once __DIR__ . '/rbac.php';
 
 // Fetch Estate Details & Primary Color setting
 $theme_color = PRIMARY_COLOR;
-$estate_name = 'Estate Management';
+$estate_name = 'Residoria';
 $estate_logo = '';
 
 try {

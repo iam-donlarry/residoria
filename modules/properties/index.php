@@ -163,6 +163,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                     <th>Usage Class</th>
                     <th>Type</th>
                     <th>Status</th>
+                    <th style="text-align: right;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -180,10 +181,20 @@ include __DIR__ . '/../../includes/sidebar.php';
                                 <?= e(str_replace('_', ' ', $u['status'])) ?>
                             </span>
                         </td>
+                        <td style="text-align: right;">
+                            <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
+                                <a href="view.php?id=<?= $u['id'] ?>" class="btn btn-sm btn-primary" title="Inspect 360° Profile">
+                                    <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Inspect 360°
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline" onclick="openPropertyDrawer(<?= $u['id'] ?>)" title="Quick Summary">
+                                    <i data-lucide="sidebar" style="width: 14px; height: 14px;"></i> Quick
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="7" class="empty-state">No property units registered yet. Click "+ Add Unit" to configure units.</td></tr>
+                    <tr><td colspan="8" class="empty-state">No property units registered yet. Click "+ Add Unit" to configure units.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
@@ -202,6 +213,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                     <th>Property Type</th>
                     <th>Total Units</th>
                     <th>Category</th>
+                    <th style="text-align: right;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -214,15 +226,22 @@ include __DIR__ . '/../../includes/sidebar.php';
                         <td><?= e($b['property_type']) ?></td>
                         <td><span class="badge badge-info"><?= $b['unit_count'] ?> Unit(s)</span></td>
                         <td><?= e(ucfirst($b['category'])) ?></td>
+                        <td style="text-align: right;">
+                            <a href="building_view.php?id=<?= $b['id'] ?>" class="btn btn-sm btn-primary">
+                                <i data-lucide="building-2" style="width: 14px; height: 14px;"></i> Occupancy Matrix
+                            </a>
+                        </td>
                     </tr>
+
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr><td colspan="6" class="empty-state">No buildings configured yet.</td></tr>
+                    <tr><td colspan="7" class="empty-state">No buildings configured yet.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
 </div>
+
 
 <!-- TAB 3: Streets & Zones -->
 <div id="zones-tab" class="tab-content" style="display: none;">
@@ -426,4 +445,6 @@ function showTab(tabId, btn) {
 }
 </script>
 
+<?php include __DIR__ . '/../../includes/property_drawer.php'; ?>
 <?php include __DIR__ . '/../../includes/footer.php'; ?>
+
