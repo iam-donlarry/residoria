@@ -161,7 +161,13 @@ $user_role = ucfirst($_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin');
                     <span class="nav-text">Roles & Permissions</span>
                 </a>
             </li>
-            <li class="<?= (str_contains($requestUri, 'settings') && !str_contains($requestUri, 'roles') && !str_contains($requestUri, 'users')) ? 'active' : ''; ?>">
+            <li class="<?= str_contains($requestUri, 'audit_logs') ? 'active' : ''; ?>">
+                <a href="<?= BASE_URL ?>reports/audit_logs" title="System Audit Logs">
+                    <i data-lucide="history"></i>
+                    <span class="nav-text">Audit Logs</span>
+                </a>
+            </li>
+            <li class="<?= (str_contains($requestUri, 'settings') && !str_contains($requestUri, 'roles') && !str_contains($requestUri, 'users') && !str_contains($requestUri, 'audit_logs')) ? 'active' : ''; ?>">
                 <a href="<?= BASE_URL ?>settings" title="System Settings">
                     <i data-lucide="settings"></i>
                     <span class="nav-text">System Settings</span>
