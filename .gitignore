@@ -1,0 +1,21 @@
+# .gitignore - Residoria Estate Management Application
+
+# Environment & Config
+.env
+.env.*
+config/local.php
+
+# Logs & Temp
+*.log
+/tmp/
+/cache/
+
+# OS / Editor Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Uploads (Keep directory structure)
+/uploads/*
+!/uploads/.gitkeep
