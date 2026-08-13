@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../includes/helpers.php';
 requirePermission('properties.view');
 
 $db = Database::getInstance();
-$building_id = intval($_GET['id'] ?? 0);
+$building_id = decodeId($_GET['id'] ?? 0);
 
 if ($building_id <= 0) {
     // If no building specified, grab the first building available
@@ -120,14 +120,14 @@ include __DIR__ . '/../../includes/sidebar.php';
         </div>
         <div style="display: flex; gap: 0.75rem; align-items: center;">
             <label style="font-weight: 600; font-size: 0.875rem;">Switch Building:</label>
-            <select onchange="window.location.href='building_view.php?id=' + this.value" class="form-control" style="width: auto;">
+            <select onchange="window.location.href='<?= BASE_URL ?>properties/building_view?id=' + this.value" class="form-control" style="width: auto;">
                 <?php foreach ($allBuildings as $bOption): ?>
                 <option value="<?= $bOption['id'] ?>" <?= $bOption['id'] == $building_id ? 'selected' : '' ?>>
                     <?= e($bOption['street_name']) ?> - <?= e($bOption['name']) ?> (<?= e($bOption['building_code']) ?>)
                 </option>
                 <?php endforeach; ?>
             </select>
-            <a href="index.php" class="btn btn-secondary">
+            <a href="<?= BASE_URL ?>properties" class="btn btn-secondary">
                 <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> All Properties
             </a>
         </div>
@@ -221,7 +221,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                         </td>
                         <td style="text-align: right;">
                             <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
-                                <a href="view.php?id=<?= $u['unit_id'] ?>" class="btn btn-sm btn-primary" title="Inspect 360° Profile">
+                                <a href="<?= BASE_URL ?>properties/view?id=<?= encodeId($u['unit_id']) ?>" class="btn btn-sm btn-primary" title="Inspect 360° Profile">
                                     <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Inspect 360°
                                 </a>
                                 <button type="button" class="btn btn-sm btn-outline" onclick="openPropertyDrawer(<?= $u['unit_id'] ?>)" title="Quick Summary">

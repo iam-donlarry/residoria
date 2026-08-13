@@ -183,7 +183,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                         </td>
                         <td style="text-align: right;">
                             <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
-                                <a href="view.php?id=<?= $u['id'] ?>" class="btn btn-sm btn-primary" title="Inspect 360° Profile">
+                                <a href="<?= BASE_URL ?>properties/view?id=<?= encodeId($u['id']) ?>" class="btn btn-sm btn-primary" title="Inspect 360° Profile">
                                     <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Inspect 360°
                                 </a>
                                 <button type="button" class="btn btn-sm btn-outline" onclick="openPropertyDrawer(<?= $u['id'] ?>)" title="Quick Summary">
@@ -227,7 +227,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                         <td><span class="badge badge-info"><?= $b['unit_count'] ?> Unit(s)</span></td>
                         <td><?= e(ucfirst($b['category'])) ?></td>
                         <td style="text-align: right;">
-                            <a href="building_view.php?id=<?= $b['id'] ?>" class="btn btn-sm btn-primary">
+                            <a href="<?= BASE_URL ?>properties/building_view?id=<?= encodeId($b['id']) ?>" class="btn btn-sm btn-primary">
                                 <i data-lucide="building-2" style="width: 14px; height: 14px;"></i> Occupancy Matrix
                             </a>
                         </td>

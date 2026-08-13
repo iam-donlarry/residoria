@@ -6,7 +6,7 @@ require_once __DIR__ . '/../includes/helpers.php';
 
 requirePermission('properties.view');
 
-$unit_id = intval($_GET['id'] ?? 0);
+$unit_id = decodeId($_GET['id'] ?? 0);
 
 if ($unit_id <= 0) {
     jsonResponse(false, "Invalid property unit ID.", [], 200);
@@ -45,6 +45,7 @@ $arrears = $db->fetchOne("
 
 jsonResponse(true, "Property summary fetched.", [
     'unit_id' => $unit['id'],
+    'encoded_id' => encodeId($unit['id']),
     'unit_code' => $unit['unit_code'],
     'unit_number' => $unit['unit_number'],
     'status' => $unit['status'],

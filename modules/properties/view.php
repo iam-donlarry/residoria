@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../includes/helpers.php';
 requirePermission('properties.view');
 
 $db = Database::getInstance();
-$unit_id = intval($_GET['id'] ?? 0);
+$unit_id = decodeId($_GET['id'] ?? 0);
 
 if ($unit_id <= 0) {
     header("Location: index");
@@ -171,10 +171,10 @@ include __DIR__ . '/../../includes/sidebar.php';
             </p>
         </div>
         <div style="display: flex; gap: 0.5rem;">
-            <a href="index.php" class="btn btn-secondary">
+            <a href="<?= BASE_URL ?>properties" class="btn btn-secondary">
                 <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to Properties
             </a>
-            <a href="building_view.php?id=<?= $unit['building_id'] ?>" class="btn btn-outline">
+            <a href="<?= BASE_URL ?>properties/building_view?id=<?= encodeId($unit['building_id']) ?>" class="btn btn-outline">
                 <i data-lucide="building-2" style="width: 16px; height: 16px;"></i> Building Matrix
             </a>
         </div>
@@ -296,7 +296,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                 <div style="text-align: center; padding: 2rem 0; color: var(--text-secondary);">
                     <i data-lucide="user-x" style="width: 36px; height: 36px; stroke-width: 1.5; margin-bottom: 0.5rem;"></i>
                     <p style="margin: 0; font-size: 0.875rem;">No active Head of Household designated for this unit.</p>
-                    <a href="../residents/index.php" class="btn btn-sm btn-primary" style="margin-top: 0.75rem;">Assign Head Resident</a>
+                    <a href="<?= BASE_URL ?>residents" class="btn btn-sm btn-primary" style="margin-top: 0.75rem;">Assign Head Resident</a>
                 </div>
                 <?php endif; ?>
             </div>
@@ -656,6 +656,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                         <th>Due Date</th>
                         <th>Status</th>
                         <th>Batch Ref</th>
+                        <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -672,6 +673,13 @@ include __DIR__ . '/../../includes/sidebar.php';
                             </span>
                         </td>
                         <td><code><?= e($inv['batch_reference'] ?: 'MANUAL') ?></code></td>
+                        <td style="text-align: right;">
+                            <?php if (in_array($inv['status'], ['paid', 'partial'])): ?>
+                            <a href="<?= BASE_URL ?>receipt.php?id=<?= encodeId($inv['id']) ?>" target="_blank" class="btn btn-sm btn-outline" title="Print Official Receipt">
+                                <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Receipt
+                            </a>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>

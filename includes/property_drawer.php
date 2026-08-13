@@ -82,7 +82,7 @@ function openPropertyDrawer(unitId) {
                 document.getElementById('drawerVehicles').innerText = data.vehicles_count;
                 document.getElementById('drawerArrears').innerText = data.formatted_arrears;
                 document.getElementById('drawerLocation').innerText = `${data.street_name} • ${data.building_name} (Floor ${data.floor_number}, Unit ${data.unit_number})`;
-                document.getElementById('drawerFullViewLink').href = `<?= BASE_URL ?>modules/properties/view.php?id=${unitId}`;
+                document.getElementById('drawerFullViewLink').href = `<?= BASE_URL ?>properties/view?id=${data.encoded_id || unitId}`;
                 details.style.display = 'block';
                 if (window.lucide) lucide.createIcons();
             } else {

@@ -26,6 +26,31 @@ function sanitize($input) {
 }
 
 /**
+ * Obfuscate integer database ID into a 20-character URL-safe string
+ */
+function encodeId($id) {
+    if (empty($id) || !is_numeric($id)) return $id;
+    $id = (int)$id;
+    $hex = sprintf('%04x', $id);
+    $salt1 = substr(md5('estate_salt1_' . $id), 0, 6);
+    $salt2 = substr(md5('estate_salt2_' . $id), 0, 10);
+    return $salt1 . $hex . $salt2; // Exactly 20 URL-safe characters
+}
+
+/**
+ * Decode obfuscated 20-character URL-safe ID back into an integer database ID
+ */
+function decodeId($str) {
+    if (empty($str)) return 0;
+    if (is_numeric($str) && intval($str) > 0) return intval($str);
+    if (is_string($str) && strlen($str) >= 20) {
+        $hex = substr($str, 6, 4);
+        return hexdec($hex);
+    }
+    return 0;
+}
+
+/**
  * Generate CSRF token for form security
  */
 function generateCsrfToken() {

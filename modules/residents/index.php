@@ -253,10 +253,10 @@ include __DIR__ . '/../../includes/sidebar.php';
                             <td><?= formatDate($r['move_in_date']) ?></td>
                             <td style="text-align: right;">
                                 <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
-                                    <a href="../properties/view?id=<?= $r['unit_id'] ?>" class="btn btn-sm btn-primary" title="Inspect Property 360°">
+                                    <a href="<?= BASE_URL ?>properties/view?id=<?= $r['unit_id'] ?>" class="btn btn-sm btn-primary" title="Inspect Property 360°">
                                         <i data-lucide="eye" style="width: 14px; height: 14px;"></i> 360° Profile
                                     </a>
-                                    <a href="index?action=move_out&id=<?= $r['id'] ?>&csrf=<?= generateCsrfToken() ?>" 
+                                    <a href="<?= BASE_URL ?>residents?action=move_out&id=<?= $r['id'] ?>&csrf=<?= generateCsrfToken() ?>" 
                                        class="btn btn-sm btn-danger" 
                                        onclick="return confirm('Are you sure you want to mark this resident as Moved Out? Shared staff access will be suspended.')"
                                        title="Mark Move Out">

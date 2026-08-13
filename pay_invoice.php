@@ -7,7 +7,7 @@ if (!isset($_GET['id'])) {
     die("<h3>Invalid Request</h3><p>No invoice ID provided.</p>");
 }
 
-$invoice_id = intval($_GET['id']);
+$invoice_id = decodeId($_GET['id']);
 $estate_id = get_estate_id();
 $db = Database::getInstance();
 

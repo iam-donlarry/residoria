@@ -97,16 +97,16 @@ include __DIR__ . '/../../includes/sidebar.php';
 
 <!-- Quick Action Shortcuts -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-    <a href="<?= BASE_URL ?>modules/people" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem; font-weight: 600;">
+    <a href="<?= BASE_URL ?>people" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem; font-weight: 600;">
         <i data-lucide="user-plus"></i> Persons Directory
     </a>
-    <a href="<?= BASE_URL ?>modules/visitors" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem; font-weight: 600;">
+    <a href="<?= BASE_URL ?>visitors" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem; font-weight: 600;">
         <i data-lucide="qr-code"></i> Visitor Access Code
     </a>
-    <a href="<?= BASE_URL ?>modules/billing" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem; font-weight: 600;">
+    <a href="<?= BASE_URL ?>billing" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem; font-weight: 600;">
         <i data-lucide="receipt"></i> Billing & Invoices
     </a>
-    <a href="<?= BASE_URL ?>modules/gate" class="btn btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem; font-weight: 700;">
+    <a href="<?= BASE_URL ?>gate" class="btn btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.85rem; font-weight: 700;">
         <i data-lucide="shield-alert"></i> Gate Clearance Portal
     </a>
 </div>
@@ -117,7 +117,7 @@ include __DIR__ . '/../../includes/sidebar.php';
     <div class="data-table-wrapper">
         <div class="table-toolbar" style="display: flex; justify-content: space-between; align-items: center;">
             <h3 style="font-size: 1rem; font-weight: 700; margin: 0;">Recent Gate Clearances</h3>
-            <a href="<?= BASE_URL ?>modules/gate" style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">View All →</a>
+            <a href="<?= BASE_URL ?>gate" style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">View All →</a>
         </div>
         <table class="data-table">
             <thead>
@@ -147,7 +147,7 @@ include __DIR__ . '/../../includes/sidebar.php';
     <div class="data-table-wrapper">
         <div class="table-toolbar" style="display: flex; justify-content: space-between; align-items: center;">
             <h3 style="font-size: 1rem; font-weight: 700; margin: 0;">Recent Invoices Issued</h3>
-            <a href="<?= BASE_URL ?>modules/billing" style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">View All →</a>
+            <a href="<?= BASE_URL ?>billing" style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">View All →</a>
         </div>
         <table class="data-table">
             <thead>

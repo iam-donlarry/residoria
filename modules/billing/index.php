@@ -290,15 +290,10 @@ include __DIR__ . '/../../includes/sidebar.php';
     </div>
 
     <?php if (!empty($message)): ?>
-    <div class="alert alert-success" style="margin-bottom: 1.5rem;">
-        <i data-lucide="check-circle" style="width: 16px; height: 16px; vertical-align: middle;"></i> <?= $message ?>
-    </div>
+        <script>document.addEventListener('DOMContentLoaded', function() { showToast(<?= json_encode(strip_tags($message)) ?>, 'success'); });</script>
     <?php endif; ?>
-
     <?php if (!empty($error)): ?>
-    <div class="alert alert-danger" style="margin-bottom: 1.5rem;">
-        <i data-lucide="alert-circle" style="width: 16px; height: 16px; vertical-align: middle;"></i> <?= $error ?>
-    </div>
+        <script>document.addEventListener('DOMContentLoaded', function() { showToast(<?= json_encode(strip_tags($error)) ?>, 'error'); });</script>
     <?php endif; ?>
 
     <!-- Navigation Tabs -->
@@ -352,11 +347,18 @@ include __DIR__ . '/../../includes/sidebar.php';
                                 </td>
                                 <td><code><?= e($inv['batch_reference'] ?: 'MANUAL') ?></code></td>
                                 <td style="text-align: right;">
-                                    <?php if (in_array($inv['status'], ['unpaid', 'partial']) && hasPermission('payments.record')): ?>
-                                    <button type="button" class="btn btn-sm btn-success" onclick="openPaymentModal(<?= $inv['id'] ?>, '<?= e($inv['invoice_number']) ?>', <?= $inv['net_amount'] ?>)">
-                                        <i data-lucide="dollar-sign" style="width: 14px; height: 14px;"></i> Record Payment
-                                    </button>
-                                    <?php endif; ?>
+                                    <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
+                                        <?php if (in_array($inv['status'], ['paid', 'partial'])): ?>
+                                        <a href="<?= BASE_URL ?>receipt.php?id=<?= encodeId($inv['id']) ?>" target="_blank" class="btn btn-sm btn-outline" title="Print Official Receipt">
+                                            <i data-lucide="printer" style="width: 14px; height: 14px;"></i> Receipt
+                                        </a>
+                                        <?php endif; ?>
+                                        <?php if (in_array($inv['status'], ['unpaid', 'partial']) && hasPermission('payments.record')): ?>
+                                        <button type="button" class="btn btn-sm btn-success" onclick="openPaymentModal(<?= $inv['id'] ?>, '<?= e($inv['invoice_number']) ?>', <?= $inv['net_amount'] ?>)">
+                                            <i data-lucide="dollar-sign" style="width: 14px; height: 14px;"></i> Record Payment
+                                        </button>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -476,6 +478,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                             <th>Payment Method</th>
                             <th>Transaction Date</th>
                             <th>Status</th>
+                            <th style="text-align: right;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -488,6 +491,13 @@ include __DIR__ . '/../../includes/sidebar.php';
                             <td><span class="badge badge-outline"><?= strtoupper(str_replace('_', ' ', e($pay['payment_method']))) ?></span></td>
                             <td><?= formatDate($pay['transaction_date'], 'M j, Y g:i A') ?></td>
                             <td><span class="badge badge-success"><?= strtoupper(e($pay['status'])) ?></span></td>
+                            <td style="text-align: right;">
+                                <?php if (!empty($pay['invoice_id'])): ?>
+                                <a href="<?= BASE_URL ?>receipt.php?id=<?= encodeId($pay['invoice_id']) ?>" target="_blank" class="btn btn-sm btn-outline" title="Print Official Receipt">
+                                    <i data-lucide="printer" style="width: 14px; height: 14px;"></i> View Receipt
+                                </a>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>

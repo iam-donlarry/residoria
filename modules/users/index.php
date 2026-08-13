@@ -175,7 +175,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                                     <button type="button" class="btn btn-sm btn-outline" onclick="openEditUserDrawer(<?= htmlspecialchars(json_encode($u), ENT_QUOTES, 'UTF-8') ?>)" title="Edit Account">
                                         <i data-lucide="edit" style="width: 14px; height: 14px;"></i> Edit
                                     </button>
-                                    <a href="users?action=toggle_status&id=<?= $u['id'] ?>&csrf=<?= generateCsrfToken() ?>" 
+                                    <a href="<?= BASE_URL ?>users?action=toggle_status&id=<?= $u['id'] ?>&csrf=<?= generateCsrfToken() ?>" 
                                        class="btn btn-sm btn-<?= $u['status'] === 'active' ? 'warning' : 'success' ?>" 
                                        onclick="return confirm('Change status for user <?= e($u['email']) ?>?')"
                                        title="Toggle Status">

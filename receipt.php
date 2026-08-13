@@ -2,34 +2,45 @@
 // receipt.php - Payment Receipt View & Printable Invoice Document
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/auth_check.php';
+require_once __DIR__ . '/includes/helpers.php';
 
 if (!isset($_GET['id'])) {
     die("Invalid Receipt Request.");
 }
 
-$invoice_id = intval($_GET['id']);
-$estate_id = get_estate_id();
+$invoice_id = decodeId($_GET['id']);
 $db = Database::getInstance();
 
-$invoice = $db->fetchOne("SELECT i.*, u.name as resident_name, u.email as resident_email, u.phone as resident_phone, f.number as flat_number, b.name as building_name 
-                         FROM invoices i 
-                         JOIN users u ON i.user_id = u.id 
-                         LEFT JOIN flats f ON i.flat_id = f.id 
-                         LEFT JOIN buildings b ON f.building_id = b.id 
-                         WHERE i.id = ? AND i.estate_id = ?", [$invoice_id, $estate_id]);
+$invoice = $db->fetchOne("
+    SELECT i.*, 
+           CONCAT(p.first_name, ' ', p.last_name) as resident_name, 
+           p.email as resident_email, 
+           p.primary_phone as resident_phone, 
+           u.unit_number, 
+           u.unit_code,
+           b.name as building_name,
+           z.name as street_name
+    FROM invoices i 
+    LEFT JOIN property_units u ON i.unit_id = u.id 
+    LEFT JOIN buildings_blocks b ON u.building_id = b.id
+    LEFT JOIN zones_streets z ON b.zone_id = z.id
+    LEFT JOIN persons p ON i.payer_person_id = p.id 
+    WHERE i.id = ?
+", [$invoice_id]);
 
 if (!$invoice) {
-    die("Receipt Not Found.");
+    die("<h3>Receipt Not Found</h3><p>The requested invoice payment receipt does not exist or has been removed.</p>");
 }
 
-$payment = $db->fetchOne("SELECT * FROM payments WHERE invoice_id = ? AND status = 'paid' ORDER BY id DESC LIMIT 1", [$invoice_id]);
+$payment = $db->fetchOne("SELECT * FROM payments WHERE invoice_id = ? AND status = 'successful' ORDER BY id DESC LIMIT 1", [$invoice_id]);
+if (!$payment) {
+    $payment = $db->fetchOne("SELECT * FROM payments WHERE invoice_id = ? ORDER BY id DESC LIMIT 1", [$invoice_id]);
+}
+
 $items = $db->fetchAll("SELECT * FROM invoice_items WHERE invoice_id = ?", [$invoice_id]);
 
-$estate_name = 'Estate Management';
-$sys_name = $db->fetchOne("SELECT setting_value FROM system_settings WHERE estate_id = ? AND setting_key = 'estate_name'", [$estate_id]);
-if ($sys_name && !empty($sys_name['setting_value'])) {
-    $estate_name = $sys_name['setting_value'];
-}
+$sys_name = $db->fetchOne("SELECT setting_value FROM system_settings WHERE setting_key = 'estate_name'");
+$estate_name = !empty($sys_name['setting_value']) ? $sys_name['setting_value'] : 'Residoria Estate';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -109,7 +120,7 @@ if ($sys_name && !empty($sys_name['setting_value'])) {
 <body>
     <div class="no-print" style="max-width: 680px; margin: 0 auto 1rem; text-align: right;">
         <button onclick="window.print()" style="padding: 0.6rem 1.2rem; background: #12B1B0; color: #fff; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
-            Print Receipt
+            Print Official Receipt
         </button>
     </div>
 
@@ -128,19 +139,19 @@ if ($sys_name && !empty($sys_name['setting_value'])) {
         <div class="meta-grid">
             <div>
                 <strong style="color: #64748b; display: block; margin-bottom: 0.25rem;">BILLED TO:</strong>
-                <div style="font-weight: 700; font-size: 1.05rem;"><?= e($invoice['resident_name']) ?></div>
-                <div style="color: #64748b;"><?= e($invoice['resident_email']) ?></div>
-                <?php if (!empty($invoice['flat_number'])): ?>
-                    <div style="color: #64748b; margin-top: 0.25rem;"><?= e($invoice['building_name']) ?> - Unit <?= e($invoice['flat_number']) ?></div>
+                <div style="font-weight: 700; font-size: 1.05rem;"><?= e($invoice['resident_name'] ?: 'Property Occupant') ?></div>
+                <div style="color: #64748b;"><?= e($invoice['resident_email'] ?: 'N/A') ?></div>
+                <?php if (!empty($invoice['unit_number'])): ?>
+                    <div style="color: #64748b; margin-top: 0.25rem;"><?= e($invoice['building_name']) ?> &bull; Unit <?= e($invoice['unit_number']) ?> (<code><?= e($invoice['unit_code']) ?></code>)</div>
                 <?php endif; ?>
             </div>
             <div style="text-align: right;">
                 <strong style="color: #64748b; display: block; margin-bottom: 0.25rem;">PAYMENT DETAILS:</strong>
                 <div>Invoice #: <strong><?= e($invoice['invoice_number'] ?? sprintf('%04d', $invoice['id'])) ?></strong></div>
-                <div>Method: <strong><?= e(ucfirst($payment['payment_method'] ?? 'manual')) ?></strong></div>
-                <div>Status: <span style="color: #10b981; font-weight: 700;">PAID ✓</span></div>
-                <?php if (!empty($payment['transaction_ref'])): ?>
-                    <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">Ref: <?= e($payment['transaction_ref']) ?></div>
+                <div>Method: <strong><?= e(strtoupper(str_replace('_', ' ', $payment['payment_method'] ?? 'manual'))) ?></strong></div>
+                <div>Status: <span style="color: #10b981; font-weight: 700;"><?= strtoupper(e($invoice['status'])) ?> ✓</span></div>
+                <?php if (!empty($payment['payment_reference'])): ?>
+                    <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.25rem;">Ref: <code><?= e($payment['payment_reference']) ?></code></div>
                 <?php endif; ?>
             </div>
         </div>
@@ -163,14 +174,14 @@ if ($sys_name && !empty($sys_name['setting_value'])) {
                 <?php else: ?>
                     <tr>
                         <td style="font-weight: 500;"><?= e($invoice['title']) ?></td>
-                        <td style="text-align: right; font-weight: 600;"><?= formatMoney($invoice['amount']) ?></td>
+                        <td style="text-align: right; font-weight: 600;"><?= formatMoney($invoice['net_amount']) ?></td>
                     </tr>
                 <?php endif; ?>
             </tbody>
         </table>
 
         <div class="total-box">
-            Total Paid: <?= formatMoney($invoice['amount']) ?>
+            Total Net Amount: <?= formatMoney($invoice['net_amount']) ?>
         </div>
 
         <div style="margin-top: 3rem; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; color: #94a3b8; font-size: 0.85rem;">
