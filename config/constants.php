@@ -6,7 +6,7 @@ if (!defined('APP_NAME')) {
 }
 
 if (!defined('APP_VERSION')) {
-    define('APP_VERSION', '3.3.0');
+    define('APP_VERSION', '3.5.0');
 }
 
 if (!defined('PRIMARY_COLOR')) {
