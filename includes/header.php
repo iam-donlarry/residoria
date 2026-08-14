@@ -28,6 +28,25 @@ try {
     // Fallback defaults
 }
 
+// Dynamic Page Title Resolution
+if (!isset($displayTitle) || empty($displayTitle)) {
+    if (!empty($pageTitle)) {
+        $displayTitle = $pageTitle;
+    } elseif (!empty($page_title)) {
+        $displayTitle = $page_title;
+    } else {
+        $rawPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+        $pathClean = trim(preg_replace('#^/estate/?#i', '', strtolower($rawPath)), '/');
+        if (empty($pathClean) || $pathClean === 'dashboard' || $pathClean === 'index.php') {
+            $displayTitle = 'Dashboard';
+        } else {
+            $segments = explode('/', $pathClean);
+            $last = end($segments);
+            $displayTitle = ucwords(str_replace(['_', '-'], ' ', $last));
+        }
+    }
+}
+
 $is_sidebar_mini = isset($_COOKIE['sidebar_mini']) && $_COOKIE['sidebar_mini'] === '1';
 ?>
 <!DOCTYPE html>
@@ -35,7 +54,7 @@ $is_sidebar_mini = isset($_COOKIE['sidebar_mini']) && $_COOKIE['sidebar_mini'] =
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= e($estate_name) ?> - System</title>
+    <title><?= e($displayTitle) ?> | <?= e($estate_name) ?></title>
     
     <!-- Google Font: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

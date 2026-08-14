@@ -28,6 +28,11 @@
                 // Save to localStorage & Cookie for persistent state across navigation
                 localStorage.setItem('sidebar_mini', isMini ? '1' : '0');
                 document.cookie = "sidebar_mini=" + (isMini ? "1" : "0") + "; path=/; max-age=31536000";
+
+                // Trigger window resize event after CSS transition so Chart.js resizes cleanly
+                setTimeout(function() {
+                    window.dispatchEvent(new Event('resize'));
+                }, 260);
             });
         }
     });

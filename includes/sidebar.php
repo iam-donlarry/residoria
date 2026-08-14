@@ -1,8 +1,19 @@
-<!-- includes/sidebar.php - Dynamic Standalone Navigation Sidebar -->
+<!-- includes/sidebar.php - Dynamic Standalone Navigation Sidebar (Expense App Paradigm with Sleek Custom Tooltips) -->
 <?php
 $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 $user_name = $_SESSION['name'] ?? $_SESSION['user_name'] ?? 'Admin User';
 $user_role = ucfirst($_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin');
+
+// Active Group Detection Helpers
+$isEstateGroupActive = str_contains($requestUri, 'properties') || (str_contains($requestUri, 'people') && !str_contains($requestUri, 'roles')) || str_contains($requestUri, 'owners') || str_contains($requestUri, 'residents') || str_contains($requestUri, 'households') || str_contains($requestUri, 'commercial');
+
+$isPersonnelGroupActive = str_contains($requestUri, 'domestic-staff') || str_contains($requestUri, 'estate-staff') || (str_contains($requestUri, 'staff') && !str_contains($requestUri, 'domestic-staff')) || str_contains($requestUri, 'vehicles');
+
+$isSecurityGroupActive = str_contains($requestUri, 'gate') || str_contains($requestUri, 'visitors');
+
+$isFinanceGroupActive = str_contains($requestUri, 'billing') || str_contains($requestUri, 'payments') || str_contains($requestUri, 'maintenance');
+
+$isSystemGroupActive = str_contains($requestUri, 'users') || str_contains($requestUri, 'roles') || str_contains($requestUri, 'audit_logs') || (str_contains($requestUri, 'settings') && !str_contains($requestUri, 'roles') && !str_contains($requestUri, 'users') && !str_contains($requestUri, 'audit_logs'));
 ?>
 <aside class="sidebar">
     <div class="sidebar-header">
@@ -18,169 +29,190 @@ $user_role = ucfirst($_SESSION['role'] ?? $_SESSION['user_role'] ?? 'Admin');
     </div>
     
     <nav class="sidebar-nav">
-        <ul>
-            <li class="nav-label">Main</li>
-            <li class="<?= (str_contains($requestUri, 'dashboard')) ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>dashboard" title="Dashboard">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span class="nav-text">Dashboard</span>
-                </a>
-            </li>
-            
-            <li class="nav-label">Estate Structure</li>
-            <?php if (hasPermission('properties.view')): ?>
-            <li class="<?= str_contains($requestUri, 'properties') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>properties" title="Properties & Streets">
+        <div class="sidebar-section-header">Main</div>
+        <a href="<?= BASE_URL ?>dashboard" class="nav-link <?= (str_contains($requestUri, 'dashboard')) ? 'active' : ''; ?>" data-tooltip="Dashboard">
+            <i data-lucide="layout-dashboard" class="nav-icon"></i> <span class="nav-text">Dashboard</span>
+        </a>
+
+        <!-- Estate & Occupants -->
+        <?php if (hasPermission('properties.view') || hasPermission('people.view') || hasPermission('owners.view') || hasPermission('residents.view') || hasPermission('commercial.view')): ?>
+        <div class="sidebar-section-header">Estate Structure</div>
+        <details class="nav-group" <?= $isEstateGroupActive ? 'open' : '' ?>>
+            <summary class="nav-group-summary" data-tooltip="Estate & Occupants">
+                <i data-lucide="building-2" class="nav-icon"></i>
+                <span class="nav-text">Estate & Occupants</span>
+                <i data-lucide="chevron-right" class="caret-icon"></i>
+            </summary>
+            <div class="sub-menu">
+                <?php if (hasPermission('properties.view')): ?>
+                <a href="<?= BASE_URL ?>properties" class="sub-nav-link <?= str_contains($requestUri, 'properties') ? 'active' : ''; ?>" data-tooltip="Properties & Units">
                     <i data-lucide="building"></i>
                     <span class="nav-text">Properties & Units</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
 
-            <?php if (hasPermission('people.view')): ?>
-            <li class="<?= (str_contains($requestUri, 'people') && !str_contains($requestUri, 'roles')) ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>people" title="Persons Directory">
+                <?php if (hasPermission('people.view')): ?>
+                <a href="<?= BASE_URL ?>people" class="sub-nav-link <?= (str_contains($requestUri, 'people') && !str_contains($requestUri, 'roles')) ? 'active' : ''; ?>" data-tooltip="Persons Directory">
                     <i data-lucide="user-check"></i>
                     <span class="nav-text">Persons Directory</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
 
-            <?php if (hasPermission('owners.view')): ?>
-            <li class="<?= str_contains($requestUri, 'owners') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>owners" title="Property Owners">
+                <?php if (hasPermission('owners.view')): ?>
+                <a href="<?= BASE_URL ?>owners" class="sub-nav-link <?= str_contains($requestUri, 'owners') ? 'active' : ''; ?>" data-tooltip="Property Owners">
                     <i data-lucide="award"></i>
                     <span class="nav-text">Property Owners</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
 
-            <?php if (hasPermission('residents.view')): ?>
-            <li class="<?= str_contains($requestUri, 'residents') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>residents" title="Residents Directory">
+                <?php if (hasPermission('residents.view')): ?>
+                <a href="<?= BASE_URL ?>residents" class="sub-nav-link <?= str_contains($requestUri, 'residents') ? 'active' : ''; ?>" data-tooltip="Residents Directory">
                     <i data-lucide="users"></i>
                     <span class="nav-text">Residents & Occupancy</span>
                 </a>
-            </li>
-            <li class="<?= str_contains($requestUri, 'households') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>households" title="Household Members">
+                <a href="<?= BASE_URL ?>households" class="sub-nav-link <?= str_contains($requestUri, 'households') ? 'active' : ''; ?>" data-tooltip="Household Members">
                     <i data-lucide="heart-handshake"></i>
                     <span class="nav-text">Household Members</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
 
-            <?php if (hasPermission('commercial.view')): ?>
-            <li class="<?= str_contains($requestUri, 'commercial') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>commercial" title="Commercial Occupants">
+                <?php if (hasPermission('commercial.view')): ?>
+                <a href="<?= BASE_URL ?>commercial" class="sub-nav-link <?= str_contains($requestUri, 'commercial') ? 'active' : ''; ?>" data-tooltip="Commercial Businesses">
                     <i data-lucide="store"></i>
                     <span class="nav-text">Commercial Businesses</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </details>
+        <?php endif; ?>
 
-            <li class="nav-label">Personnel & Vehicles</li>
-            <?php if (hasPermission('residents.view')): ?>
-            <li class="<?= str_contains($requestUri, 'domestic-staff') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>domestic-staff" title="Domestic Staff">
+        <!-- Personnel & Fleet -->
+        <?php if (hasPermission('residents.view') || hasPermission('staff.view') || hasPermission('vehicles.view')): ?>
+        <div class="sidebar-section-header">Personnel & Fleet</div>
+        <details class="nav-group" <?= $isPersonnelGroupActive ? 'open' : '' ?>>
+            <summary class="nav-group-summary" data-tooltip="Personnel & Vehicles">
+                <i data-lucide="users-round" class="nav-icon"></i>
+                <span class="nav-text">Personnel & Vehicles</span>
+                <i data-lucide="chevron-right" class="caret-icon"></i>
+            </summary>
+            <div class="sub-menu">
+                <?php if (hasPermission('residents.view')): ?>
+                <a href="<?= BASE_URL ?>domestic-staff" class="sub-nav-link <?= str_contains($requestUri, 'domestic-staff') ? 'active' : ''; ?>" data-tooltip="Domestic Staff">
                     <i data-lucide="user-cog"></i>
                     <span class="nav-text">Domestic Staff</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
 
-            <?php if (hasPermission('staff.view')): ?>
-            <li class="<?= str_contains($requestUri, 'estate-staff') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>estate-staff" title="Estate Staff">
+                <?php if (hasPermission('staff.view')): ?>
+                <a href="<?= BASE_URL ?>estate-staff" class="sub-nav-link <?= (str_contains($requestUri, 'estate-staff') || (str_contains($requestUri, 'staff') && !str_contains($requestUri, 'domestic-staff'))) ? 'active' : ''; ?>" data-tooltip="Estate Staff">
                     <i data-lucide="badge-check"></i>
                     <span class="nav-text">Estate Staff</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
 
-            <?php if (hasPermission('vehicles.view')): ?>
-            <li class="<?= str_contains($requestUri, 'vehicles') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>vehicles" title="Vehicle Register">
+                <?php if (hasPermission('vehicles.view')): ?>
+                <a href="<?= BASE_URL ?>vehicles" class="sub-nav-link <?= str_contains($requestUri, 'vehicles') ? 'active' : ''; ?>" data-tooltip="Vehicle Register">
                     <i data-lucide="car"></i>
                     <span class="nav-text">Vehicle Register</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </details>
+        <?php endif; ?>
 
-            <li class="nav-label">Gate Security</li>
-            <?php if (hasPermission('security.gate')): ?>
-            <li class="<?= str_contains($requestUri, 'gate') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>gate" title="Gate Portal">
+        <!-- Gate Security -->
+        <?php if (hasPermission('security.gate') || hasPermission('security.view')): ?>
+        <div class="sidebar-section-header">Gate Security</div>
+        <details class="nav-group" <?= $isSecurityGroupActive ? 'open' : '' ?>>
+            <summary class="nav-group-summary" data-tooltip="Gate & Security">
+                <i data-lucide="shield-check" class="nav-icon"></i>
+                <span class="nav-text">Gate & Security</span>
+                <i data-lucide="chevron-right" class="caret-icon"></i>
+            </summary>
+            <div class="sub-menu">
+                <?php if (hasPermission('security.gate')): ?>
+                <a href="<?= BASE_URL ?>gate" class="sub-nav-link <?= str_contains($requestUri, 'gate') ? 'active' : ''; ?>" data-tooltip="Gate Check-in Portal">
                     <i data-lucide="shield-alert"></i>
                     <span class="nav-text">Gate Check-in Portal</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
 
-            <?php if (hasPermission('security.view')): ?>
-            <li class="<?= str_contains($requestUri, 'visitors') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>visitors" title="Visitor Passes">
+                <?php if (hasPermission('security.view')): ?>
+                <a href="<?= BASE_URL ?>visitors" class="sub-nav-link <?= str_contains($requestUri, 'visitors') ? 'active' : ''; ?>" data-tooltip="Visitor Authorization">
                     <i data-lucide="qr-code"></i>
                     <span class="nav-text">Visitor Authorization</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </details>
+        <?php endif; ?>
 
-            <li class="nav-label">Finance & Ops</li>
-            <?php if (hasPermission('billing.view')): ?>
-            <li class="<?= (str_contains($requestUri, 'billing') || str_contains($requestUri, 'payments')) ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>billing" title="Finance & Billing">
+        <!-- Finance & Operations -->
+        <?php if (hasPermission('billing.view') || hasPermission('maintenance.view')): ?>
+        <div class="sidebar-section-header">Finance & Ops</div>
+        <details class="nav-group" <?= $isFinanceGroupActive ? 'open' : '' ?>>
+            <summary class="nav-group-summary" data-tooltip="Finance & Ops">
+                <i data-lucide="landmark" class="nav-icon"></i>
+                <span class="nav-text">Finance & Ops</span>
+                <i data-lucide="chevron-right" class="caret-icon"></i>
+            </summary>
+            <div class="sub-menu">
+                <?php if (hasPermission('billing.view')): ?>
+                <a href="<?= BASE_URL ?>billing" class="sub-nav-link <?= (str_contains($requestUri, 'billing') || str_contains($requestUri, 'payments')) ? 'active' : ''; ?>" data-tooltip="Finance & Ledgers">
                     <i data-lucide="receipt"></i>
                     <span class="nav-text">Finance & Ledgers</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
 
-            <?php if (hasPermission('maintenance.view')): ?>
-            <li class="<?= str_contains($requestUri, 'maintenance') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>maintenance" title="Maintenance">
+                <?php if (hasPermission('maintenance.view')): ?>
+                <a href="<?= BASE_URL ?>maintenance" class="sub-nav-link <?= str_contains($requestUri, 'maintenance') ? 'active' : ''; ?>" data-tooltip="Maintenance Tickets">
                     <i data-lucide="wrench"></i>
                     <span class="nav-text">Maintenance Tickets</span>
                 </a>
-            </li>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </details>
+        <?php endif; ?>
 
-            <li class="nav-label">System</li>
-            <?php if (hasPermission('settings.manage')): ?>
-            <li class="<?= str_contains($requestUri, 'users') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>users" title="System Users & Accounts">
+        <!-- System Administration -->
+        <?php if (hasPermission('settings.manage') || hasPermission('settings.view')): ?>
+        <div class="sidebar-section-header">System</div>
+        <details class="nav-group" <?= $isSystemGroupActive ? 'open' : '' ?>>
+            <summary class="nav-group-summary" data-tooltip="System Admin">
+                <i data-lucide="sliders" class="nav-icon"></i>
+                <span class="nav-text">System Admin</span>
+                <i data-lucide="chevron-right" class="caret-icon"></i>
+            </summary>
+            <div class="sub-menu">
+                <?php if (hasPermission('settings.manage')): ?>
+                <a href="<?= BASE_URL ?>users" class="sub-nav-link <?= str_contains($requestUri, 'users') ? 'active' : ''; ?>" data-tooltip="System Users">
                     <i data-lucide="user-check"></i>
                     <span class="nav-text">System Users</span>
                 </a>
-            </li>
-            <?php endif; ?>
-            <?php if (hasPermission('settings.view')): ?>
-            <li class="<?= str_contains($requestUri, 'roles') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>roles" title="Roles & Permissions">
+                <?php endif; ?>
+                <?php if (hasPermission('settings.view')): ?>
+                <a href="<?= BASE_URL ?>roles" class="sub-nav-link <?= str_contains($requestUri, 'roles') ? 'active' : ''; ?>" data-tooltip="Roles & Permissions">
                     <i data-lucide="shield-check"></i>
                     <span class="nav-text">Roles & Permissions</span>
                 </a>
-            </li>
-            <li class="<?= str_contains($requestUri, 'audit_logs') ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>reports/audit_logs" title="System Audit Logs">
+                <a href="<?= BASE_URL ?>reports/audit_logs" class="sub-nav-link <?= str_contains($requestUri, 'audit_logs') ? 'active' : ''; ?>" data-tooltip="Audit Logs">
                     <i data-lucide="history"></i>
                     <span class="nav-text">Audit Logs</span>
                 </a>
-            </li>
-            <li class="<?= (str_contains($requestUri, 'settings') && !str_contains($requestUri, 'roles') && !str_contains($requestUri, 'users') && !str_contains($requestUri, 'audit_logs')) ? 'active' : ''; ?>">
-                <a href="<?= BASE_URL ?>settings" title="System Settings">
+                <a href="<?= BASE_URL ?>settings" class="sub-nav-link <?= (str_contains($requestUri, 'settings') && !str_contains($requestUri, 'roles') && !str_contains($requestUri, 'users') && !str_contains($requestUri, 'audit_logs')) ? 'active' : ''; ?>" data-tooltip="System Settings">
                     <i data-lucide="settings"></i>
                     <span class="nav-text">System Settings</span>
                 </a>
-            </li>
-            <?php endif; ?>
-            <li>
-                <a href="<?= BASE_URL ?>logout.php" title="Logout">
-                    <i data-lucide="log-out"></i>
-                    <span class="nav-text">Logout</span>
-                </a>
-            </li>
-        </ul>
+                <?php endif; ?>
+            </div>
+        </details>
+        <?php endif; ?>
+
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 0.75rem 0;">
+
+        <a href="<?= BASE_URL ?>logout.php" class="nav-link" data-tooltip="Logout">
+            <i data-lucide="log-out" class="nav-icon"></i> <span class="nav-text">Logout</span>
+        </a>
     </nav>
 </aside>
 

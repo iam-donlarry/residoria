@@ -190,9 +190,9 @@ include __DIR__ . '/../../includes/sidebar.php';
     </div>
 
     <!-- ANALYTICS CHARTS GRID 1 -->
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; width: 100%; min-width: 0;">
         <!-- Chart 1: 6-Month Financial Collections & Invoiced Trend -->
-        <div class="card" style="background: white; border-radius: 1rem; border: 1px solid var(--border-color); padding: 1.5rem;">
+        <div class="card" style="background: white; border-radius: 1rem; border: 1px solid var(--border-color); padding: 1.5rem; min-width: 0; max-width: 100%; overflow: hidden;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <div>
                     <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--text-primary);">6-Month Financial Revenue & Collections Trend</h3>
@@ -200,27 +200,27 @@ include __DIR__ . '/../../includes/sidebar.php';
                 </div>
                 <span class="badge badge-success">FINANCIAL HEALTH</span>
             </div>
-            <div style="height: 280px; position: relative;">
+            <div style="height: 280px; position: relative; width: 100%; min-width: 0; overflow: hidden;">
                 <canvas id="financialTrendChart"></canvas>
             </div>
         </div>
 
         <!-- Chart 2: Property Occupancy Breakdown -->
-        <div class="card" style="background: white; border-radius: 1rem; border: 1px solid var(--border-color); padding: 1.5rem;">
+        <div class="card" style="background: white; border-radius: 1rem; border: 1px solid var(--border-color); padding: 1.5rem; min-width: 0; max-width: 100%; overflow: hidden;">
             <div style="margin-bottom: 1rem;">
                 <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--text-primary);">Property Unit Distribution</h3>
                 <p style="font-size: 0.8125rem; color: var(--text-secondary); margin: 0.15rem 0 0;">Capacity utilization across residential, commercial, & vacant units</p>
             </div>
-            <div style="height: 280px; position: relative; display: flex; align-items: center; justify-content: center;">
+            <div style="height: 280px; position: relative; display: flex; align-items: center; justify-content: center; width: 100%; min-width: 0; overflow: hidden;">
                 <canvas id="occupancyDoughnutChart"></canvas>
             </div>
         </div>
     </div>
 
     <!-- ANALYTICS CHARTS GRID 2 -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; width: 100%; min-width: 0;">
         <!-- Chart 3: 24-Hour Gate Clearance Traffic Density -->
-        <div class="card" style="background: white; border-radius: 1rem; border: 1px solid var(--border-color); padding: 1.5rem;">
+        <div class="card" style="background: white; border-radius: 1rem; border: 1px solid var(--border-color); padding: 1.5rem; min-width: 0; max-width: 100%; overflow: hidden;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <div>
                     <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--text-primary);">Today's Security Gate Traffic Density</h3>
@@ -228,7 +228,7 @@ include __DIR__ . '/../../includes/sidebar.php';
                 </div>
                 <span class="badge badge-info">24-HOUR TRAFFIC</span>
             </div>
-            <div style="height: 240px; position: relative;">
+            <div style="height: 240px; position: relative; width: 100%; min-width: 0; overflow: hidden;">
                 <canvas id="gateTrafficChart"></canvas>
             </div>
         </div>

@@ -104,7 +104,8 @@ body {
     margin: 0;
 }
 
-.nav-label {
+/* Nav Link & Single Section Headers (Expense App Paradigm) */
+.sidebar-section-header, .nav-label {
     color: #64748b;
     font-size: 0.7rem;
     font-weight: 700;
@@ -113,7 +114,7 @@ body {
     padding: 1.25rem 1.5rem 0.4rem 1.5rem;
 }
 
-.sidebar-nav ul li a {
+.nav-link, .sidebar-nav ul li a {
     display: flex;
     align-items: center;
     padding: 0.65rem 1rem;
@@ -127,8 +128,8 @@ body {
     white-space: nowrap;
 }
 
-.sidebar-nav ul li a svg,
-.sidebar-nav ul li a i[data-lucide] {
+.nav-link svg, .nav-link i[data-lucide],
+.sidebar-nav ul li a svg, .sidebar-nav ul li a i[data-lucide] {
     width: 18px;
     height: 18px;
     margin-right: 0.75rem;
@@ -137,34 +138,156 @@ body {
     flex-shrink: 0;
 }
 
-.sidebar-nav ul li a:hover {
+.nav-link:hover, .sidebar-nav ul li a:hover {
     background: #e2e8f0 !important;
     color: #0f172a !important;
 }
 
-.sidebar-nav ul li a:hover svg,
-.sidebar-nav ul li a:hover i[data-lucide] {
+.nav-link:hover svg, .nav-link:hover i[data-lucide],
+.sidebar-nav ul li a:hover svg, .sidebar-nav ul li a:hover i[data-lucide] {
     color: #0f172a !important;
 }
 
-.sidebar-nav ul li.active a,
-.sidebar-nav ul li a.active {
+.nav-link.active, .sidebar-nav ul li.active a, .sidebar-nav ul li a.active {
     background: var(--primary) !important;
     color: #ffffff !important;
     font-weight: 600;
     box-shadow: 0 4px 12px rgba(18, 177, 176, 0.35);
 }
 
-.sidebar-nav ul li.active a svg,
-.sidebar-nav ul li.active a i[data-lucide],
-.sidebar-nav ul li a.active svg,
-.sidebar-nav ul li a.active i[data-lucide] {
+.nav-link.active svg, .nav-link.active i[data-lucide],
+.sidebar-nav ul li.active a svg, .sidebar-nav ul li.active a i[data-lucide],
+.sidebar-nav ul li a.active svg, .sidebar-nav ul li a.active i[data-lucide] {
+    color: #ffffff !important;
+}
+
+/* Nav Groups (Native HTML5 Details/Summary Accordion - Expense App Replica) */
+details.nav-group {
+    margin-bottom: 2px;
+}
+
+summary.nav-group-summary {
+    display: flex;
+    align-items: center;
+    padding: 0.65rem 1rem;
+    margin: 2px 12px;
+    color: #334155;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: var(--transition);
+    user-select: none;
+    list-style: none !important;
+}
+
+.sidebar-nav a {
+    text-decoration: none !important;
+}
+
+details summary::-webkit-details-marker,
+details summary::marker,
+summary::-webkit-details-marker,
+summary::marker {
+    display: none !important;
+    font-size: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    color: transparent !important;
+}
+
+summary.nav-group-summary::-webkit-details-marker,
+summary.nav-group-summary::marker {
+    display: none !important;
+}
+
+summary.nav-group-summary:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+summary.nav-group-summary svg, summary.nav-group-summary i[data-lucide] {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.75rem;
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+.caret-icon {
+    margin-left: auto;
+    width: 14px !important;
+    height: 14px !important;
+    transition: transform 0.2s ease;
+    margin-right: 0 !important;
+}
+
+details[open] summary.nav-group-summary {
+    color: var(--primary);
+    background: rgba(18, 177, 176, 0.08);
+}
+
+details[open] summary.nav-group-summary svg, 
+details[open] summary.nav-group-summary i[data-lucide] {
+    color: var(--primary);
+}
+
+details[open] .caret-icon {
+    transform: rotate(90deg);
+}
+
+.sub-menu {
+    padding-left: 1.75rem;
+    margin-top: 2px;
+}
+
+.sub-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0.5rem 1rem;
+    margin: 2px 12px 2px 0;
+    color: #475569 !important;
+    font-size: 0.8375rem;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.sub-nav-link svg, .sub-nav-link i[data-lucide] {
+    width: 15px !important;
+    height: 15px !important;
+    margin-right: 0.6rem !important;
+    color: #64748b;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.sub-nav-link:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+.sub-nav-link:hover svg, .sub-nav-link:hover i[data-lucide] {
+    color: #0f172a !important;
+}
+
+.sub-nav-link.active {
+    background: var(--primary) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.sub-nav-link.active svg, .sub-nav-link.active i[data-lucide] {
     color: #ffffff !important;
 }
 
 /* --- Sidebar Minimization (sidebar-mini) --- */
-body.sidebar-mini .sidebar {
+body.sidebar-mini .sidebar,
+body.sidebar-mini .sidebar-nav {
     width: 70px !important;
+    overflow: visible !important;
 }
 
 body.sidebar-mini .main-content {
@@ -174,7 +297,9 @@ body.sidebar-mini .main-content {
 
 body.sidebar-mini .nav-text,
 body.sidebar-mini .nav-label,
-body.sidebar-mini .logo span {
+body.sidebar-mini .sidebar-section-header,
+body.sidebar-mini .logo span,
+body.sidebar-mini .caret-icon {
     display: none !important;
 }
 
@@ -183,15 +308,86 @@ body.sidebar-mini .sidebar-header {
     justify-content: center;
 }
 
+body.sidebar-mini .nav-link,
+body.sidebar-mini summary.nav-group-summary,
+body.sidebar-mini .sub-nav-link,
 body.sidebar-mini .sidebar-nav ul li a {
     justify-content: center !important;
     padding: 0.75rem 0 !important;
     margin: 4px 8px !important;
+    position: relative !important;
 }
 
+body.sidebar-mini .sub-menu {
+    padding-left: 0 !important;
+}
+
+body.sidebar-mini .nav-link svg,
+body.sidebar-mini .nav-link i[data-lucide],
+body.sidebar-mini summary.nav-group-summary svg,
+body.sidebar-mini summary.nav-group-summary i[data-lucide],
+body.sidebar-mini .sub-nav-link svg,
+body.sidebar-mini .sub-nav-link i[data-lucide],
 body.sidebar-mini .sidebar-nav ul li a svg,
 body.sidebar-mini .sidebar-nav ul li a i[data-lucide] {
     margin-right: 0 !important;
+}
+
+/* Floating Hover Tooltips in Minimized State (Sleek Dark Pill Design) */
+body.sidebar-mini [data-tooltip] {
+    position: relative !important;
+}
+
+body.sidebar-mini [data-tooltip]::before {
+    content: '';
+    position: absolute;
+    left: calc(100% + 4px);
+    top: 50%;
+    transform: translateY(-50%) translateX(-4px);
+    border-width: 5px 6px 5px 0;
+    border-style: solid;
+    border-color: transparent #0f172a transparent transparent;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 99999 !important;
+    pointer-events: none;
+}
+
+body.sidebar-mini [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%) translateX(6px);
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #f8fafc;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.02em;
+    border-radius: 8px;
+    white-space: nowrap;
+    z-index: 99999 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+body.sidebar-mini [data-tooltip]:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0px);
+}
+
+body.sidebar-mini [data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0px);
 }
 
 /* Main Layout Positioning */
@@ -201,6 +397,8 @@ body.sidebar-mini .sidebar-nav ul li a i[data-lucide] {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+    max-width: 100%;
     transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -220,6 +418,9 @@ body.sidebar-mini .sidebar-nav ul li a i[data-lucide] {
 .content-wrapper {
     padding: 2rem;
     flex: 1;
+    overflow-x: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Buttons */
@@ -282,6 +483,9 @@ body.sidebar-mini .sidebar-nav ul li a i[data-lucide] {
     padding: 1.5rem;
     box-shadow: var(--shadow-sm);
     margin-bottom: 1.5rem;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* Forms */
